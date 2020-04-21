@@ -3,4 +3,16 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="white">#FFFFFF</color>
+
+
+
+    <color name="culqi_blue">#39207C</color>
+    <color name="culqi_green">#26D07C</color>
+
+    <color name="izipay_pink1">#EF3C4F</color>
+    <color name="izipay_pink2">#E02020</color>
+    <color name="vendemas_yellow">#FFC600</color>
+    <color name="bbva_blue">#005BA6</color>
+
 </resources>
