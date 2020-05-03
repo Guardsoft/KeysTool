@@ -46,6 +46,16 @@ public class MainActivity extends AppCompatActivity {
     Button btnTmkValidate;
     @BindView(R.id.btn_tmk_inject)
     Button btnTmkInject;
+    @BindView(R.id.tv_tdk_slot)
+    TextView tvTdkSlot;
+    @BindView(R.id.et_tdk_key)
+    TextInputEditText etTdkKey;
+    @BindView(R.id.btn_tdk_validate)
+    Button btnTdkValidate;
+    @BindView(R.id.btn_tdk_inject)
+    Button btnTdkInject;
+    @BindView(R.id.tv_read_tmk_slot)
+    TextView tvReadTmkSlot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,19 +71,31 @@ public class MainActivity extends AppCompatActivity {
 
         etTmkKey.addTextChangedListener(new KeyFormatWatcher(etTmkKey));
 
+        etTdkKey.setText("60AB5A1E944ED2936F1954B7C34C9C5B");
+
+        etTdkKey.addTextChangedListener(new KeyFormatWatcher(etTdkKey));
+
         tvTmkSlot.setOnClickListener(view -> {
             showMenuPopupSlot(view);
         });
 
-        btnTlkInject.setOnClickListener(view ->{
+        tvReadTmkSlot.setOnClickListener(view ->{
+            showMenuPopupSlot(view);
+        });
+
+        tvTdkSlot.setOnClickListener(view -> {
+            showMenuPopupSlot(view);
+        });
+
+        btnTlkInject.setOnClickListener(view -> {
             writeTlk();
         });
 
-        btnTlkValidate.setOnClickListener(view ->{
+        btnTlkValidate.setOnClickListener(view -> {
             validateTlk();
         });
 
-        btnTmkInject.setOnClickListener(view ->{
+        btnTmkInject.setOnClickListener(view -> {
             writeTmk();
         });
 
@@ -81,7 +103,17 @@ public class MainActivity extends AppCompatActivity {
             validateTmk();
         });
 
+
+        btnTdkInject.setOnClickListener(view -> {
+            writeTdk();
+        });
+
+        btnTdkValidate.setOnClickListener(view -> {
+            validateTdk();
+        });
+
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -104,30 +136,28 @@ public class MainActivity extends AppCompatActivity {
 
     private void validateTlk() {
         String result;
-        try{
-            result =  TradeApplication.getConvert().bcdToStr( Device.getKCV_TLK());
-            FancyToast.makeText(this, result, FancyToast.LENGTH_LONG, FancyToast.INFO,false).show();
-        }
-        catch (Exception ex){
+        try {
+            result = TradeApplication.getConvert().bcdToStr(Device.getKCV_TLK());
+            FancyToast.makeText(this, result, FancyToast.LENGTH_SHORT, FancyToast.INFO, false).show();
+        } catch (Exception ex) {
             Log.e(TAG, "keyValidateTlk: ", ex);
             result = "Vacío";
-            FancyToast.makeText(this, result, FancyToast.LENGTH_LONG, FancyToast.ERROR,false).show();
+            FancyToast.makeText(this, result, FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
         }
     }
 
     private void validateTmk() {
         String result;
-        try{
+        try {
             String temp = tvTmkSlot.getText().toString().split(":")[1].trim();
             int slotTmk = Integer.parseInt(temp);
 
-            result =  TradeApplication.getConvert().bcdToStr( Device.getKCV_TMK((byte)slotTmk));
-            FancyToast.makeText(this, result, FancyToast.LENGTH_LONG, FancyToast.INFO,false).show();
-        }
-        catch (Exception ex){
+            result = TradeApplication.getConvert().bcdToStr(Device.getKCV_TMK((byte) slotTmk));
+            FancyToast.makeText(this, result, FancyToast.LENGTH_SHORT, FancyToast.INFO, false).show();
+        } catch (Exception ex) {
             Log.e(TAG, "validateTmk: ", ex);
             result = "Vacío";
-            FancyToast.makeText(this, result, FancyToast.LENGTH_LONG, FancyToast.ERROR,false).show();
+            FancyToast.makeText(this, result, FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
         }
     }
 
@@ -150,9 +180,9 @@ public class MainActivity extends AppCompatActivity {
                 .strToBcd(TLK, IConvert.EPaddingPosition.PADDING_LEFT);
 
         if (Device.writeTLK(bytesTLK)) {
-            FancyToast.makeText(MainActivity.this,"Success",FancyToast.LENGTH_LONG,FancyToast.SUCCESS,false).show();
-        }else{
-            FancyToast.makeText(this, "ERROR", FancyToast.LENGTH_LONG, FancyToast.ERROR,false).show();
+            FancyToast.makeText(MainActivity.this, "Success", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show();
+        } else {
+            FancyToast.makeText(this, "ERROR", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
         }
     }
 
@@ -178,12 +208,61 @@ public class MainActivity extends AppCompatActivity {
                 .strToBcd(TMK, IConvert.EPaddingPosition.PADDING_LEFT);
 
         if (Device.writeTMK2(slotTmk, bytesTMK)) {
-            FancyToast.makeText(MainActivity.this,"Success",FancyToast.LENGTH_LONG,FancyToast.SUCCESS,false).show();
-        }else{
-            FancyToast.makeText(this, "ERROR", FancyToast.LENGTH_LONG, FancyToast.ERROR,false).show();
+            FancyToast.makeText(MainActivity.this, "Success", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show();
+        } else {
+            FancyToast.makeText(this, "ERROR", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
         }
     }
 
+    private void writeTdk() {
+
+        String tempTmk = tvReadTmkSlot.getText().toString().split(":")[1].trim();
+        String tempTdk = tvTdkSlot.getText().toString().split(":")[1].trim();
+
+        int slotTmk = Integer.parseInt(tempTmk);
+        int slotTdk = Integer.parseInt(tempTdk);
+
+        String TDK = etTdkKey.getText().toString().trim();
+
+        TDK = TDK.replaceAll("(\n|\r)", "");
+
+        if (TDK.equals("")) {
+            etTdkKey.setError("Ingresa una llave válida");
+            etTdkKey.requestFocus();
+            return;
+        }
+
+        Log.i(TAG, "writeTdk: " + TDK);
+
+        byte[] bytesTMK = TradeApplication
+                .getConvert()
+                .strToBcd(TDK, IConvert.EPaddingPosition.PADDING_LEFT);
+
+        if (Device.writeTDK2(slotTmk, slotTdk, bytesTMK)) {
+            FancyToast.makeText(MainActivity.this, "Success", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show();
+        } else {
+            FancyToast.makeText(this, "ERROR", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
+        }
+
+    }
+
+    private void validateTdk() {
+
+        String result;
+        try {
+            String tempTdk = tvTdkSlot.getText().toString().split(":")[1].trim();
+
+            int slotTdk = Integer.parseInt(tempTdk);
+
+            result = TradeApplication.getConvert().bcdToStr(Device.getKCV_TDK((byte) slotTdk));
+            FancyToast.makeText(this, result, FancyToast.LENGTH_SHORT, FancyToast.INFO, false).show();
+        } catch (Exception ex) {
+            Log.e(TAG, "validateTmk: ", ex);
+            result = "Vacío";
+            FancyToast.makeText(this, result, FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
+        }
+
+    }
 
     public class KeyFormatWatcher implements TextWatcher {
 
@@ -234,30 +313,74 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showMenuPopupSlot(View v) {
+
         PopupMenu popup = new PopupMenu(this, v);
 
-        popup.setOnMenuItemClickListener(item -> {
+        int itemId = v.getId();
 
+        switch (itemId){
+            case R.id.tv_tmk_slot :
+                menuTmkSlot(popup);
+                break;
+
+            case R.id.tv_tdk_slot :
+                menuTdkSlot(popup);
+                break;
+            case R.id.tv_read_tmk_slot :
+                menuReadTmkSlot(popup);
+                break;
+
+            default:
+                Log.i(TAG, "showMenuPopupTdkSlot: ");
+        }
+
+        popup.show();
+    }
+
+
+    private void menuTmkSlot(PopupMenu popup){
+        popup.setOnMenuItemClickListener(item -> {
             String menuSlot = item.getTitle().toString().split(":")[1];
             int slotTmk = Integer.parseInt(menuSlot.trim());
-
             tvTmkSlot.setText(MessageFormat.format("SLOT : {0}", slotTmk));
-
             return false;
         });
 
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.menu_slot, popup.getMenu());
-        popup.show();
     }
 
-    public  boolean cleanKeys() {
+    private void menuTdkSlot(PopupMenu popup){
+        popup.setOnMenuItemClickListener(item -> {
+            String menuSlot = item.getTitle().toString().split(":")[1];
+            int slotTmk = Integer.parseInt(menuSlot.trim());
+            tvTdkSlot.setText(MessageFormat.format("SLOT TDK : {0}", slotTmk));
+            return false;
+        });
+
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_tdk_slot, popup.getMenu());
+    }
+
+    private void menuReadTmkSlot(PopupMenu popup){
+        popup.setOnMenuItemClickListener(item -> {
+            String menuSlot = item.getTitle().toString().split(":")[1];
+            int slotTmk = Integer.parseInt(menuSlot.trim());
+            tvReadTmkSlot.setText(MessageFormat.format("SLOT TMK : {0}", slotTmk));
+            return false;
+        });
+
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_slot, popup.getMenu());
+    }
+
+    public boolean cleanKeys() {
         try {
             TradeApplication.getDal().getPed(EPedType.INTERNAL).erase();
-            FancyToast.makeText(MainActivity.this,"Success",FancyToast.LENGTH_LONG,FancyToast.SUCCESS,false).show();
+            FancyToast.makeText(MainActivity.this, "Success", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show();
             return true;
         } catch (PedDevException e) {
-            FancyToast.makeText(this, e.getMessage(), FancyToast.LENGTH_LONG, FancyToast.ERROR,false).show();
+            FancyToast.makeText(this, e.getMessage(), FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
             Log.w(TAG, e);
         }
         return false;
